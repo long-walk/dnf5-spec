@@ -10,8 +10,8 @@ Version:        %{project_version_prime}.%{project_version_major}.%{project_vers
 Release:        1%{?dist}
 Summary:        Command-line package manager
 License:        GPL-2.0-or-later
-URL:            https://github.com/rpm-software-management/dnf5
-Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
+URL:            https://github.com/long-walk/dnf5
+Source:         https://github.com/long-walk/dnf5/archive/dnf5_single-line.tar.gz#%{_sourcedir}/%{name}-%{version}.tar.gz
 
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
@@ -757,6 +757,10 @@ automatically and regularly from systemd timers, cron jobs or similar.
 # ========== unpack, build, check & install ==========
 
 %prep
+tar xzf ../SOURCES/%{name}-%{version}.tar.gz
+mv dnf5-copr_dnf5_single_line_upgrade %{name}-%{version}
+tar czf ../SOURCES/%{name}-%{version}.tar.gz %{name}-%{version}
+rm -rf dnf5 %{name}-%{version}
 %autosetup -p1 -n dnf5-%{version}
 
 
