@@ -758,7 +758,7 @@ automatically and regularly from systemd timers, cron jobs or similar.
 
 %prep
 tar xzf ../SOURCES/%{name}-%{version}.tar.gz
-mv dnf5_single-line %{name}-%{version}
+mv dnf5-dnf5_single-linee %{name}-%{version}
 tar czf ../SOURCES/%{name}-%{version}.tar.gz %{name}-%{version}
 rm -rf dnf5 %{name}-%{version}
 %autosetup -p1 -n dnf5-%{version}
