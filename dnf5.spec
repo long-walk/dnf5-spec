@@ -1,6 +1,6 @@
 %global project_version_prime 5
 %global project_version_major 2
-%global project_version_minor 3
+%global project_version_minor 4
 %global project_version_micro 0
 
 %bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 11]
@@ -58,6 +58,7 @@ Provides:       dnf5-command(module)
 Provides:       dnf5-command(offline)
 Provides:       dnf5-command(provides)
 Provides:       dnf5-command(reinstall)
+Provides:       dnf5-command(replay)
 Provides:       dnf5-command(remove)
 Provides:       dnf5-command(repo)
 Provides:       dnf5-command(repoquery)
@@ -114,7 +115,7 @@ Provides:       dnf5-command(versionlock)
 # ========== versions of dependencies ==========
 
 %global libmodulemd_version 2.5.0
-%global librepo_version 1.15.0
+%global librepo_version 1.18.0
 %global libsolv_version 0.7.25
 %global sqlite_version 3.35.0
 %global swig_version 4
@@ -277,8 +278,8 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %dir %{_datadir}/bash-completion/
 %dir %{_datadir}/bash-completion/completions/
 %{_datadir}/bash-completion/completions/dnf*
-%dir %{_prefix}/lib/sysimage/dnf
-%verify(not md5 size mtime) %ghost %{_prefix}/lib/sysimage/dnf/*
+%dir %{_prefix}/lib/sysimage/libdnf5
+%verify(not md5 size mtime) %ghost %{_prefix}/lib/sysimage/libdnf5/*
 %license COPYING.md
 %license gpl-2.0.txt
 %{_mandir}/man8/dnf5.8.*
@@ -308,6 +309,7 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %{_mandir}/man8/dnf*-provides.8.*
 %{_mandir}/man8/dnf*-reinstall.8.*
 %{_mandir}/man8/dnf*-remove.8.*
+%{_mandir}/man8/dnf*-replay.8.*
 %{_mandir}/man8/dnf*-repo.8.*
 %{_mandir}/man8/dnf*-repoquery.8.*
 %{_mandir}/man8/dnf*-search.8.*
@@ -358,6 +360,7 @@ Package management library.
 %else
 %exclude %{_sysconfdir}/dnf/dnf.conf
 %endif
+%ghost %{_sysconfdir}/dnf/versionlock.toml
 %dir %{_datadir}/dnf5/libdnf.conf.d
 %dir %{_sysconfdir}/dnf/libdnf5.conf.d
 %dir %{_datadir}/dnf5/repos.override.d
@@ -715,6 +718,7 @@ config-manager, copr, and repoclosure commands.
 %{_mandir}/man8/dnf*-copr.8.*
 %{_mandir}/man8/dnf*-needs-restarting.8.*
 %{_mandir}/man8/dnf*-repoclosure.8.*
+%{_datadir}/dnf5/aliases.d/compatibility-plugins.conf
 
 
 # ========== dnf5-automatic plugin ==========
@@ -828,15 +832,18 @@ done
 %endif
 
 # own dirs and files that dnf5 creates on runtime
-mkdir -p %{buildroot}%{_prefix}/lib/sysimage/dnf
-for files in \
-    groups.toml modules.toml nevras.toml packages.toml \
-    system.toml transaction_history.sqlite \
-    transaction_history.sqlite-shm \
-    transaction_history.sqlite-wal userinstalled.toml
+mkdir -p %{buildroot}%{_prefix}/lib/sysimage/libdnf5
+for file in \
+    environments.toml groups.toml modules.toml nevras.toml packages.toml \
+    system.toml \
+    transaction_history.sqlite transaction_history.sqlite-shm \
+    transaction_history.sqlite-wal
 do
-    touch %{buildroot}%{_prefix}/lib/sysimage/dnf/$files
+    touch %{buildroot}%{_prefix}/lib/sysimage/libdnf5/$file
 done
+mkdir -p %{buildroot}%{_prefix}/lib/sysimage/libdnf5/comps_groups
+mkdir -p %{buildroot}%{_prefix}/lib/sysimage/libdnf5/offline
+touch %{buildroot}%{_sysconfdir}/dnf/versionlock.toml
 
 # Remove if condition when Fedora 37 is EOL
 %if 0%{?fedora} > 37 || 0%{?rhel} > 10
@@ -868,6 +875,12 @@ popd
 %ldconfig_scriptlets
 
 %changelog
+* Wed Jun 26 2024 Packit Team <hello@packit.dev> - 5.2.4.0-1
+- New upstream release 5.2.4.0
+
+* Mon Jun 03 2024 Packit Team <hello@packit.dev> - 5.2.3.0-1
+- New upstream release 5.2.3.0
+
 * Tue May 28 2024 Packit Team <hello@packit.dev> - 5.2.2.0-1
 - New upstream release 5.2.2.0
 
