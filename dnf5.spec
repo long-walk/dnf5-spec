@@ -3,7 +3,7 @@
 %global project_version_minor 6
 %global project_version_micro 1
 
-%bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 11]
+%bcond dnf5_obsoletes_dnf %[0%{?fedora} > 41 || 0%{?rhel} > 11]
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
@@ -136,7 +136,7 @@ Provides:       dnf5-command(versionlock)
 
 # ========== build requires ==========
 
-%if 0%{?fedora} > 40 || 0%{?rhel} > 10
+%if 0%{?fedora} > 41 || 0%{?rhel} > 10
 BuildRequires:  bash-completion-devel
 %else
 BuildRequires:  bash-completion
