@@ -1,7 +1,7 @@
 %global project_version_prime 5
 %global project_version_major 2
-%global project_version_minor 5
-%global project_version_micro 0
+%global project_version_minor 6
+%global project_version_micro 1
 
 %bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 11]
 
@@ -18,6 +18,7 @@ Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 %if %{without dnf5_obsoletes_dnf}
 Requires:       dnf-data
 %endif
+Recommends:     (dnf5-plugins if dnf-plugins-core)
 Recommends:     bash-completion
 Requires:       coreutils
 
@@ -108,6 +109,13 @@ Provides:       dnf5-command(versionlock)
 %bcond_with    performance_tests
 %bcond_with    dnf5daemon_tests
 
+# Disable SOLVER_FLAG_FOCUS_NEW only for RHEL
+%if 0%{?rhel} && 0%{?rhel} < 10
+%bcond_with    focus_new
+%else
+%bcond_without focus_new
+%endif
+
 %if %{with clang}
     %global toolchain clang
 %endif
@@ -116,7 +124,11 @@ Provides:       dnf5-command(versionlock)
 
 %global libmodulemd_version 2.5.0
 %global librepo_version 1.18.0
-%global libsolv_version 0.7.25
+%if %{with focus_new}
+    %global libsolv_version 0.7.30
+%else
+    %global libsolv_version 0.7.25
+%endif
 %global sqlite_version 3.35.0
 %global swig_version 4
 %global zchunk_version 0.9.11
@@ -296,8 +308,7 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %{_mandir}/man8/dnf*-download.8.*
 %{_mandir}/man8/dnf*-environment.8.*
 %{_mandir}/man8/dnf*-group.8.*
-# TODO(jkolarik): history is not ready yet
-# %%{_mandir}/man8/dnf*-history.8.*
+%{_mandir}/man8/dnf*-history.8.*
 %{_mandir}/man8/dnf*-info.8.*
 %{_mandir}/man8/dnf*-install.8.*
 %{_mandir}/man8/dnf*-leaves.8.*
@@ -320,13 +331,12 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %{_mandir}/man7/dnf*-aliases.7.*
 %{_mandir}/man7/dnf*-caching.7.*
 %{_mandir}/man7/dnf*-comps.7.*
-# TODO(jkolarik): filtering is not ready yet
-# %%{_mandir}/man7/dnf*-filtering.7.*
+%{_mandir}/man7/dnf*-filtering.7.*
 %{_mandir}/man7/dnf*-forcearch.7.*
 %{_mandir}/man7/dnf*-installroot.7.*
-# TODO(jkolarik): modularity is not ready yet
-# %%{_mandir}/man7/dnf*-modularity.7.*
+%{_mandir}/man7/dnf*-modularity.7.*
 %{_mandir}/man7/dnf*-specs.7.*
+%{_mandir}/man7/dnf*-system-state.7.*
 %{_mandir}/man5/dnf*.conf.5.*
 %{_mandir}/man5/dnf*.conf-todo.5.*
 %{_mandir}/man5/dnf*.conf-deprecated.5.*
@@ -693,6 +703,7 @@ Summary:        Plugins for dnf5
 License:        LGPL-2.1-or-later
 Requires:       dnf5%{?_isa} = %{version}-%{release}
 Requires:       libcurl%{?_isa} >= 7.62.0
+Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Provides:       dnf5-command(builddep)
 Provides:       dnf5-command(changelog)
@@ -728,6 +739,8 @@ Summary:        Package manager - automated upgrades
 License:        LGPL-2.1-or-later
 Requires:       dnf5%{?_isa} = %{version}-%{release}
 Requires:       libcurl-full%{?_isa}
+Requires:       libdnf5%{?_isa} = %{version}-%{release}
+Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Provides:       dnf5-command(automatic)
 %if %{with dnf5_obsoletes_dnf}
 Provides:       dnf-automatic = %{version}-%{release}
@@ -744,6 +757,8 @@ automatically and regularly from systemd timers, cron jobs or similar.
 %ghost %{_sysconfdir}/motd.d/dnf5-automatic
 %{_libdir}/dnf5/plugins/automatic_cmd_plugin.so
 %{_datadir}/dnf5/dnf5-plugins/automatic.conf
+%ghost %config(noreplace) %{_sysconfdir}/dnf/automatic.conf
+%ghost %config(noreplace) %{_sysconfdir}/dnf/dnf5-plugins/automatic.conf
 %{_mandir}/man8/dnf*-automatic.8.*
 %{_unitdir}/dnf5-automatic.service
 %{_unitdir}/dnf5-automatic.timer
@@ -774,6 +789,8 @@ rm -rf dnf5 %{name}-%{version}
 %cmake \
     -DPACKAGE_VERSION=%{version} \
     -DPERL_INSTALLDIRS=vendor \
+    \
+    -DENABLE_SOLV_FOCUSNEW=%{?with_focus_new:ON}%{!?with_focus_new:OFF} \
     \
     -DWITH_DNF5DAEMON_CLIENT=%{?with_dnf5daemon_client:ON}%{!?with_dnf5daemon_client:OFF} \
     -DWITH_DNF5DAEMON_SERVER=%{?with_dnf5daemon_server:ON}%{!?with_dnf5daemon_server:OFF} \
@@ -875,6 +892,15 @@ popd
 %ldconfig_scriptlets
 
 %changelog
+* Thu Sep 19 2024 Packit Team <hello@packit.dev> - 5.2.6.1-1
+- New upstream release 5.2.6.1
+
+* Mon Sep 09 2024 Packit Team <hello@packit.dev> - 5.2.6.0-1
+- New upstream release 5.2.6.0
+
+* Tue Jul 23 2024 Packit Team <hello@packit.dev> - 5.2.5.0-1
+- New upstream release 5.2.5.0
+
 * Wed Jun 26 2024 Packit Team <hello@packit.dev> - 5.2.4.0-1
 - New upstream release 5.2.4.0
 
