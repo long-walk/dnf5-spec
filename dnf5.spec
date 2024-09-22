@@ -1,9 +1,9 @@
 %global project_version_prime 5
 %global project_version_major 2
 %global project_version_minor 6
-%global project_version_micro 1
+%global project_version_micro 2
 
-%bcond dnf5_obsoletes_dnf %[0%{?fedora} > 41 || 0%{?rhel} > 11]
+%bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 11]
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
@@ -136,7 +136,7 @@ Provides:       dnf5-command(versionlock)
 
 # ========== build requires ==========
 
-%if 0%{?fedora} > 41 || 0%{?rhel} > 10
+%if 0%{?fedora} > 40 || 0%{?rhel} > 10
 BuildRequires:  bash-completion-devel
 %else
 BuildRequires:  bash-completion
@@ -381,7 +381,7 @@ Package management library.
 %dir %{_libdir}/libdnf5
 %{_libdir}/libdnf5.so.2*
 %license lgpl-2.1.txt
-%{_var}/cache/libdnf5/
+%ghost %attr(0755, root, root) %dir %{_var}/cache/libdnf5
 
 # ========== libdnf5-cli ==========
 
@@ -892,6 +892,9 @@ popd
 %ldconfig_scriptlets
 
 %changelog
+* Fri Sep 20 2024 Packit Team <hello@packit.dev> - 5.2.6.2-1
+- New upstream release 5.2.6.2
+
 * Thu Sep 19 2024 Packit Team <hello@packit.dev> - 5.2.6.1-1
 - New upstream release 5.2.6.1
 
