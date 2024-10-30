@@ -22,8 +22,7 @@ Recommends:     (dnf5-plugins if dnf-plugins-core)
 Recommends:     bash-completion
 Requires:       coreutils
 
-# Remove if condition when Fedora 37 is EOL
-%if 0%{?fedora} > 37 || 0%{?rhel} > 10
+%if 0%{?fedora} || 0%{?rhel} > 10
 Provides:       microdnf = %{version}-%{release}
 Obsoletes:      microdnf < 4
 %endif
@@ -271,8 +270,7 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %{_bindir}/yum
 %endif
 
-# Remove if condition when Fedora 37 is EOL
-%if 0%{?fedora} > 37 || 0%{?rhel} > 10
+%if 0%{?fedora} || 0%{?rhel} > 10
 %{_bindir}/microdnf
 %endif
 
@@ -337,6 +335,7 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %{_mandir}/man7/dnf*-modularity.7.*
 %{_mandir}/man7/dnf*-specs.7.*
 %{_mandir}/man7/dnf*-system-state.7.*
+%{_mandir}/man7/dnf*-changes-from-dnf4.7.*
 %{_mandir}/man5/dnf*.conf.5.*
 %{_mandir}/man5/dnf*.conf-todo.5.*
 %{_mandir}/man5/dnf*.conf-deprecated.5.*
@@ -862,8 +861,7 @@ mkdir -p %{buildroot}%{_prefix}/lib/sysimage/libdnf5/comps_groups
 mkdir -p %{buildroot}%{_prefix}/lib/sysimage/libdnf5/offline
 touch %{buildroot}%{_sysconfdir}/dnf/versionlock.toml
 
-# Remove if condition when Fedora 37 is EOL
-%if 0%{?fedora} > 37 || 0%{?rhel} > 10
+%if 0%{?fedora} || 0%{?rhel} > 10
 ln -sr %{buildroot}%{_bindir}/dnf5 %{buildroot}%{_bindir}/microdnf
 %endif
 
